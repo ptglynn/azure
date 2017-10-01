@@ -776,6 +776,9 @@
                         "properties": {
                         "mode": "Incremental",
                         "addressPrefix": "[variables('subnet3Prefix')]",
+                        "networkSecurityGroup": {
+                            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgname-web'))]"
+                        },
                         "routeTable": {
                             "id": "[resourceId('Microsoft.Network/routeTables', variables('routeTableWeb'))]"
                             }
