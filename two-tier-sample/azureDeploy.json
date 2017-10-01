@@ -97,6 +97,7 @@
     "vnetName": "fwVNET",
     "virtualNetworkName": "[concat(variables('vnetName'), variables('unqString'))]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
+    "nsgname-web": "WebNSG",
     "nsgname-mgmt": "DefaultNSG",
     "nsgname-untrust": "DefaultNSG",
     "subnet0Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet0Name'))]",
@@ -200,6 +201,56 @@
     },
     {
         "apiVersion": "[variables('apiVersion')]",
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "name": "WebNSG",
+        "location": "[variables('location')]",
+        "properties": {
+            "securityRules": [{
+                "name": "Allow-80-From-Outside",
+                "properties": {
+                    "description": "Allow Web Browsing",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "80",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 1000,
+                    "direction": "Inbound"
+                }
+            },
+            {
+                "name": "Allow-22-From-Outside",
+                "properties": {
+                    "description": "Allow SSH",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "22",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 1001,
+                    "direction": "Inbound"
+                }
+            },
+            {
+                "name": "Default-Deny",
+                "properties": {
+                    "description": "Default-Deny if we don't match Allow rule",
+                    "protocol": "*",
+                    "sourcePortRange": "*",
+                    "destinationPortRange": "*",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Deny",
+                    "priority": 2000,
+                    "direction": "Inbound"
+                }
+            }]
+        }
+    },
+    {
+        "apiVersion": "[variables('apiVersion')]",
         "type": "Microsoft.Network/routeTables",
         "name": "[variables('routeTableTrust')]",
         "location": "[variables('location')]",
@@ -224,6 +275,14 @@
                 "name": "Web-to-Firewall-DB",
                 "properties": {
                     "addressPrefix": "[variables('subnet4Prefix')]",
+                    "nextHopType": "VirtualAppliance",
+                    "nextHopIpAddress": "[variables('FWPrivateIPAddressTrust')]"
+                }
+            },
+            {
+                "name": "Web-to-Firewall-Web",
+                "properties": {
+                    "addressPrefix": "[variables('subnet3Prefix')]",
                     "nextHopType": "VirtualAppliance",
                     "nextHopIpAddress": "[variables('FWPrivateIPAddressTrust')]"
                 }
@@ -271,7 +330,8 @@
          "[concat('Microsoft.Network/routeTables/', variables('routeTableWeb'))]",
          "[concat('Microsoft.Network/routeTables/', variables('routeTableDB'))]",
          "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgname-mgmt'))]",
-                  "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgname-untrust'))]"
+         "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgname-web'))]",
+         "[concat('Microsoft.Network/networkSecurityGroups/', variables('nsgname-untrust'))]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -311,7 +371,10 @@
           {
            "name": "[variables('subnet3Name')]",
             "properties": {
-            "addressPrefix": "[variables('subnet3Prefix')]"
+            "addressPrefix": "[variables('subnet3Prefix')]",
+            "networkSecurityGroup": {
+                   "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgname-web'))]"
+              }
             }
           },
           {
