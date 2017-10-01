@@ -689,7 +689,7 @@
               "type": "CustomScript",
               "typeHandlerVersion": "2.0",
               "settings": {
-                 "fileUris": ["https://raw.githubusercontent.com/PaloAltoNetworks/azure/master/two-tier-sample/config_mysql.py"],
+                 "fileUris": ["https://raw.githubusercontent.com/ptglynn/azure/master/two-tier-sample/config_mysql.py"],
                  "commandToExecute": "python config_mysql.py"
              }
         }
@@ -708,7 +708,7 @@
               "type": "CustomScript",
               "typeHandlerVersion": "2.0",
               "settings": {
-                  "fileUris": ["https://raw.githubusercontent.com/PaloAltoNetworks/azure/master/two-tier-sample/config-fw.py"],
+                  "fileUris": ["https://raw.githubusercontent.com/ptglynn/azure/master/two-tier-sample/config-fw.py"],
                   "commandToExecute": "[concat('python config-fw.py ', reference(variables('WebPublicIPName')).dnsSettings.fqdn)]"
              }
         }
