@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<config version="7.1.0" urldb="paloaltonetworks">
+<config version="8.0.0" urldb="paloaltonetworks">
   <mgt-config>
     <users>
       <entry name="paloalto">
@@ -75,6 +75,52 @@
         <technology/>
       </application-type>
     </content-preview>
+    <log-settings>
+      <http>
+        <entry name="quarantine">
+          <server>
+            <entry name="Azure">
+              <address>your.function.url</address>
+              <http-method>POST</http-method>
+              <protocol>HTTPS</protocol>
+              <port>443</port>
+            </entry>
+          </server>
+          <format>
+            <threat>
+              <url-format>/api/myfunction1</url-format>
+              <headers>
+                <entry name="content-type">
+                  <value>text/html</value>
+                </entry>
+              </headers>
+              <payload>TenantID=azure tenant id
+&amp;ClientID=service principal id
+&amp;ClientSecret=service principal password (!URL encoded!)
+&amp;SubscriptionID=azure subscription id
+&amp;ResourceGroupName=resource group name
+&amp;NetworkSecurityGroupName=NSG of subnet to quarantine
+&amp;Region=azure region
+&amp;Attacker=$src</payload>
+            </threat>
+          </format>
+        </entry>
+      </http>
+      <profiles>
+        <entry name="quarantine">
+          <match-list>
+            <entry name="quarantine">
+              <send-http>
+                <member>quarantine</member>
+              </send-http>
+              <log-type>threat</log-type>
+              <filter>(subtype eq vulnerability)</filter>
+              <send-to-panorama>no</send-to-panorama>
+            </entry>
+          </match-list>
+        </entry>
+      </profiles>
+    </log-settings>
   </shared>
   <devices>
     <entry name="localhost.localdomain">
@@ -348,6 +394,7 @@
               <accept-dhcp-domain>no</accept-dhcp-domain>
             </dhcp-client>
           </type>
+          <server-verification>yes</server-verification>
         </system>
         <setting>
           <config>
@@ -625,6 +672,7 @@
                       </vulnerability>
                     </profiles>
                   </profile-setting>
+                  <log-setting>quarantine</log-setting>
                 </entry>
                 <entry name="Log default deny">
                   <to>
