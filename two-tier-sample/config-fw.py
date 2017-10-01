@@ -67,7 +67,7 @@ def main():
     #global baseStorageAccountName
 
     #baseStorageAccountName = sys.argv[2]
-    config_file_url = "https://raw.githubusercontent.com/PaloAltoNetworks/azure/master/two-tier-sample/"
+    config_file_url = "https://raw.githubusercontent.com/ptglynn/azure/master/two-tier-sample/"
 
     t1 = threading.Thread(name='config_fw',target=config_fw)
     t1.start()
