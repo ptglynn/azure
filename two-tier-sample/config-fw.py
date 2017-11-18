@@ -80,8 +80,11 @@ def main():
 #         logger.info("[ERROR]: Config WP failed")
 #         return
 
-
-
+    t3 = threading.Thread(name='config_dvwa', target=config_dvwa)
+    t3.start()
+#    if(config_dvwa(sys.argv[1]) == 'false'):
+#         logger.info("[ERROR]: Config DVWA failed")
+#         return
 
 def config_fw():
     global api_key
@@ -420,7 +423,132 @@ def config_wp(nat_fqdn):
     open("./wp_configured", "w").close()
     return 'true'
 
+#Configure DVWA server
+def config_dvwa():
 
+    #This means firewall already configured..so exit script.
+    if os.path.exists("./dvwa_configured") == True:
+        logger.info("[INFO]: WP already configured. Bon Appetit!")
+        return 'true'
+
+    logger.info("[INFO]: Install and Config wordpress server")
+
+	#configure the wordpress server
+    try:
+        subprocess.check_output(shlex.split("sudo apt-get install -y unzip"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: apt-get install unzip error")
+        return 'false'
+    
+    try:
+        subprocess.check_output(shlex.split("sudo apt-get install -y php"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: apt-get install php error")
+        return 'false'
+    
+    try:
+        subprocess.check_output(shlex.split("sudo apt-get install -y php-pear"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: apt-get install php-pear error")
+        return 'false'
+    
+    try:
+        subprocess.check_output(shlex.split("sudo apt-get install -y debconf-utils"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: apt-get install debconf-utils error")
+        return 'false'
+
+    #Download DVWA
+    try:
+        subprocess.check_output(shlex.split("sudo wget https://github.com/ethicalhack3r/DVWA/archive/master.zip -P /var/www/html/"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: wget DVWA error {}".format(e))
+        return 'false'
+
+	try:
+        subprocess.check_output(shlex.split("sudo unzip /var/www/html/master.zip -d /var/www/html/"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: ubzip DVWA error")
+        return 'false'
+    
+    try:
+        subprocess.check_output(shlex.split("sudo cp /var/www/html/DVWA-master/config/config.inc.php.dist  /var/www/html/DVWA-master/config/config.inc.php"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: cp php error")
+        return 'false'
+
+	#Reconfigure PHP
+    try:
+        subprocess.check_output(shlex.split("sudo sed -i \"s/allow_url_include = Off/allow_url_include = On/g\" /etc/php/7.0/apache2/php.ini"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: reconfigure allow_url_include error")
+        return 'false'
+    
+    try:
+        subprocess.check_output(shlex.split("sudo sed -i \"sed -i \"s/p@ssw0rd/panadmin/g\" /var/www/html/DVWA-master/config/config.inc.php"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: set admin password error")
+        return 'false'
+    
+    try:
+        subprocess.check_output(shlex.split("sudo sed -i \"s/avatar varchar(70)/avatar varchar(100)/g\" /var/www/html/DVWA-master/dvwa/includes/DBMS/MySQL.php"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: update DBMS error")
+        return 'false'
+
+	#Reconfigure PHP
+    try:
+        subprocess.check_output(shlex.split("sudo mv /var/www/html/DVWA-master /var/www/html/dvwa"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: error moving DVWA-master")
+        return 'false'
+    
+    #Reconfigure directory permissions
+    try:
+        subprocess.check_output(shlex.split("sudo chmod 777 /var/www/html/dvwa /var/www/html/dvwa/hackable/uploads /var/www/html/dvwa/external/phpids/0.6/lib/IDS/tmp/phpids_log.txt"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: error changing permissions")
+        return 'false'
+    
+    #Set the root password for mysql
+    try:
+        subprocess.check_output(shlex.split("sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password panadmin"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: error setting root password in mysql")
+        return 'false'
+        
+    try:
+        subprocess.check_output(shlex.split("sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password panadmin"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: error confirmain root password in mysql")
+        return 'false'
+
+	#Install mysql locally
+    try:
+        subprocess.check_output(shlex.split("sudo apt-get install -y mysql-server"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: error setting root password in mysql")
+        return 'false'
+        
+    #Create the DVWA database
+    try:
+        subprocess.check_output(shlex.split("sudo mysql -uroot -ppanadmin -e \"CREATE DATABASE dvwa;\""))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: error setting root password in mysql")
+        return 'false'
+    
+    #Restart apache2 to let this take effect
+    try:
+        subprocess.check_output(shlex.split("systemctl restart apache2"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: Apache2 restart error {}".format(e))
+        return 'false'
+
+    logger.info("[INFO]: ALL DONE!")
+    #Create a marker file that shows WP is already configured so we don't run this script again.
+    open("./dvwa_configured", "w").close()
+    return 'true'
+                                            
 def send_command(cmd):
     global MgmtIp
     global api_key
