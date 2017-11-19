@@ -505,37 +505,46 @@ def config_wp(nat_fqdn):
     #Set the root password for mysql
     logger.info("[INFO]: set root db passwd")
     try:
-        subprocess.check_output(shlex.split("sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password panadmin'"))
+        subprocess.check_output(shlex.split("echo \"mysql-server mysql-server/root_password password panadmin\" | sudo debconf-set-selections"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: error setting root password in mysql")
         return 'false'
         
     logger.info("[INFO]: set db root passwd again")
     try:
-        subprocess.check_output(shlex.split("sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password panadmin'"))
+        subprocess.check_output(shlex.split("echo \"mysql-server mysql-server/root_password_again password panadmin\" | sudo debconf-set-selections"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: error confirmain root password in mysql")
         return 'false'
 
-    logger.info("[INFO]: ALL DONE!")
-    #Create a marker file that shows WP is already configured so we don't run this script again.
-    open("./wp_configured", "w").close()
-    return 'true'
-    
-    #Set the root password for mysql
-    logger.info("[INFO]: set root db passwd")
+        #Install mysql locally
+    logger.info("[INFO]: apt-get install mysql")
     try:
-        subprocess.check_output(shlex.split("sudo debconf-set-selections <<< mysql-server mysql-server/root_password password panadmin"))
+        subprocess.check_output(shlex.split("sudo apt-get install -y mysql-server"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: error setting root password in mysql")
         return 'false'
         
-    logger.info("[INFO]: set db root passwd again")
+    #Create the DVWA database
+    logger.info("[INFO]: create db")
     try:
-        subprocess.check_output(shlex.split("sudo debconf-set-selections <<< mysql-server mysql-server/root_password_again password panadmin"))
+        subprocess.check_output(shlex.split("sudo mysql -uroot -ppanadmin -e \"CREATE DATABASE dvwa;\""))
     except subprocess.CalledProcessError, e:
-        logger.info("[ERROR]: error confirmain root password in mysql")
+        logger.info("[ERROR]: error setting root password in mysql")
         return 'false'
+
+	#Restart apache2 to let this take effect
+    logger.info("[INFO]: restart apache")
+    try:
+        subprocess.check_output(shlex.split("systemctl restart apache2"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: Apache2 restart error {}".format(e))
+        return 'false'
+        
+    logger.info("[INFO]: ALL DONE!")
+    #Create a marker file that shows WP is already configured so we don't run this script again.
+    open("./wp_configured", "w").close()
+    return 'true'
 
 def send_command(cmd):
     global MgmtIp
