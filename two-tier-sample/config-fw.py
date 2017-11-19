@@ -463,7 +463,7 @@ def config_wp(nat_fqdn):
 	#Restart apache2 to let this take effect
 	logger.info("[INFO]: restart apache")
 	try:
-        subprocess.check_output(shlex.split("systemctl restart apache2"))
+		subprocess.check_output(shlex.split("systemctl restart apache2"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: Apache2 restart error {}".format(e))
         return 'false'
