@@ -502,7 +502,7 @@ def config_wp(nat_fqdn):
         logger.info("[ERROR]: error changing permissions")
         return 'false'
 
-logger.info("[INFO]: ALL DONE!")
+    logger.info("[INFO]: ALL DONE!")
     #Create a marker file that shows WP is already configured so we don't run this script again.
     open("./wp_configured", "w").close()
     return 'true'
