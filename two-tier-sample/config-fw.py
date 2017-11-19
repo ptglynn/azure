@@ -68,23 +68,26 @@ def main():
 
     #baseStorageAccountName = sys.argv[2]
     config_file_url = "https://raw.githubusercontent.com/ptglynn/azure/master/two-tier-sample/"
-
-    t1 = threading.Thread(name='config_fw',target=config_fw)
+	
+	logger.info("[INFO]: Configuring FW")
+	t1 = threading.Thread(name='config_fw',target=config_fw)
     t1.start()
-#    if (config_fw() == 'false'):
-#        logger.info("[ERROR]: Config FW Failed")
-#        return
+    if (config_fw() == 'false'):
+        logger.info("[ERROR]: Config FW Failed")
+        return
+	logger.info("[INFO]: Configuring WP")
     t2 = threading.Thread(name='config_wp', target=config_wp, args=(sys.argv[1],))
     t2.start()
-#    if(config_wp(sys.argv[1]) == 'false'):
-#         logger.info("[ERROR]: Config WP failed")
-#         return
+    if(config_wp(sys.argv[1]) == 'false'):
+         logger.info("[ERROR]: Config WP failed")
+         return
 
+	logger.info("[INFO]: Configuring DVWA")
     t3 = threading.Thread(name='config_dvwa', target=config_dvwa)
     t3.start()
-#    if(config_dvwa(sys.argv[1]) == 'false'):
-#         logger.info("[ERROR]: Config DVWA failed")
-#         return
+    if(config_dvwa(sys.argv[1]) == 'false'):
+         logger.info("[ERROR]: Config DVWA failed")
+         return
 
 def config_fw():
     global api_key
@@ -112,35 +115,7 @@ def config_fw():
         else:
             time.sleep(10)
             continue
-
-
-
-    #Load default outbound allow https/https config to fw
-    #if(send_command('initial_config') == 'false'):
-    #    logger.info("[ERROR]: Adding initial config failed")
-    #    return 'false'
-    #else:
-    #    logger.info("[INFO]: Adding initial config success")
-
-
-    #i = 0
-    #while(i<5):
-    #    err = send_command('commit')
-    #    if(err == 'false'):
-    #        logger.info("[ERROR]: Initial Commit error")
-    #        return 'false'
-    #    elif (err == 'try_commit_again'):
-    #         logger.info("[INFO]: Trying initial commit again")
-    #         i+=1
-    #         time.sleep(15)
-    #         continue
-    #    else:
-    #        logger.info("[INFO]: Initial Commit successful")
-    #        break
-
-    #then download config
-
-    #Config gw
+		
     #Download the config file from Azure storage account to local disk
     try:
         err = urllib2.urlopen(config_file_url+config_file_name,context=gcontext, timeout=10)
@@ -222,41 +197,6 @@ def config_wp(nat_fqdn):
         return 'true'
 
     logger.info("[INFO]: Install and Config wordpress server")
-
-
-    #Get public IP address
-    #try:
-    #    publicip = urllib2.urlopen('http://ip.42.pl/raw').read()
-    #except Exception as e:
-    #    logger.info("[ERROR]: Getting public IP address : {}".format(e))
-    #    return  'false'
-    #else:
-    #    logger.info("[INFO]: Should have public IP address %s" % (publicip))
-
-
-    #Need to get public IP of NAT box. Might change with multi public ip
-
-
-    #if (publicip == ""):
-    #    return 'false'
-
-
-    #Download the wp config file from Azure storage account to local disk
-    #try:
-    #    err = urllib2.urlopen(config_file_url+wp_script_file, context=gcontext, timeout=10)
-        #err = urllib2.urlopen(config_file_url+config_file_name, timeout=10)
-    #    logger.info("DOWNLOADING CONFIG FILE" + config_file_url+wp_script_file)
-
-    #    with open(wp_script_file, "w") as local_file:
-    #        local_file.write(err.read())
-    #    local_file.close()
-    #handle errors
-    #except HTTPError, e:
-    #    logger.info("[ERROR]HTTP Error: {}".format(e.code))
-    #except URLError, e:
-    #    logger.info("[ERROR]HTTP Error: {}".format(e.reason))
-
-    #config_wp_string = "sh ./%s %s %s" % (wp_script_file, publicip)
 
 
     #configure the wordpress server
