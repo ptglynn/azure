@@ -511,14 +511,14 @@ def config_wp(nat_fqdn):
     #Set the root password for mysql
     logger.info("[INFO]: set root db passwd")
     try:
-        subprocess.check_output(shlex.split("sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password panadmin'"))
+        subprocess.check_output(shlex.split("sudo debconf-set-selections <<< mysql-server mysql-server/root_password password panadmin"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: error setting root password in mysql")
         return 'false'
         
     logger.info("[INFO]: set db root passwd again")
     try:
-        subprocess.check_output(shlex.split("sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password panadmin'"))
+        subprocess.check_output(shlex.split("sudo debconf-set-selections <<< mysql-server mysql-server/root_password_again password panadmin"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: error confirmain root password in mysql")
         return 'false'
