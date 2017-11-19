@@ -465,7 +465,7 @@ def config_dvwa():
         logger.info("[ERROR]: wget DVWA error {}".format(e))
         return 'false'
 
-	try:
+    try:
         subprocess.check_output(shlex.split("sudo unzip /var/www/html/master.zip -d /var/www/html/"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: ubzip DVWA error")
