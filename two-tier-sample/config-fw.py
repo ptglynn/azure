@@ -71,7 +71,7 @@ def main():
 	
 	logger.info("[INFO]: Configuring FW")
 	t1 = threading.Thread(name='config_fw',target=config_fw)
-    t1.start()
+   	t1.start()
     if (config_fw() == 'false'):
         logger.info("[ERROR]: Config FW Failed")
         return
