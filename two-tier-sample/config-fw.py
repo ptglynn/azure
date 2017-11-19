@@ -475,7 +475,7 @@ def config_wp(nat_fqdn):
     
     logger.info("[INFO]: update config file")
     try:
-        subprocess.check_output(shlex.split("sudo sed -i \"sed -i \"s/p@ssw0rd/panadmin/g\" /var/www/html/DVWA-master/config/config.inc.php"))
+        subprocess.check_output(shlex.split("sudo sed -i \"s/p@ssw0rd/panadmin/g\" /var/www/html/DVWA-master/config/config.inc.php"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: set admin password error")
         return 'false'
