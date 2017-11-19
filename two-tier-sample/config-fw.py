@@ -443,6 +443,36 @@ def config_wp(nat_fqdn):
         logger.info("[ERROR]: apt-get install debconf-utils error")
         return 'false'
     
+    #Download DVWA
+    logger.info("[INFO]: download dvwa")
+    try:
+        subprocess.check_output(shlex.split("sudo wget https://github.com/ethicalhack3r/DVWA/archive/master.zip -P /var/www/html/"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: wget DVWA error {}".format(e))
+        return 'false'
+
+    logger.info("[INFO]: unzip dvwa")
+    try:
+        subprocess.check_output(shlex.split("sudo unzip /var/www/html/master.zip -d /var/www/html/"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: ubzip DVWA error")
+        return 'false'
+    
+    logger.info("[INFO]: cp config file")
+    try:
+        subprocess.check_output(shlex.split("sudo cp /var/www/html/DVWA-master/config/config.inc.php.dist  /var/www/html/DVWA-master/config/config.inc.php"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: cp php error")
+        return 'false'
+
+	#Reconfigure PHP
+    logger.info("[INFO]: reconfigure dvwa")
+    try:
+        subprocess.check_output(shlex.split("sudo sed -i \"s/allow_url_include = Off/allow_url_include = On/g\" /etc/php/7.0/apache2/php.ini"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: reconfigure allow_url_include error")
+        return 'false'
+    
     logger.info("[INFO]: ALL DONE!")
     #Create a marker file that shows WP is already configured so we don't run this script again.
     open("./wp_configured", "w").close()
