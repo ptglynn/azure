@@ -63,15 +63,13 @@ curl_string = 'curl --form file=@%s --insecure "https://%s/api/?type=import&cate
 
 
 def main():
-    global config_file_url
-    #global baseStorageAccountName
-
-    #baseStorageAccountName = sys.argv[2]
-    config_file_url = "https://raw.githubusercontent.com/ptglynn/azure/master/two-tier-sample/"
-	
+	global config_file_url
+	#global baseStorageAccountName
+	#baseStorageAccountName = sys.argv[2]
+	config_file_url = "https://raw.githubusercontent.com/ptglynn/azure/master/two-tier-sample/"	
 	logger.info("[INFO]: Configuring FW")
 	t1 = threading.Thread(name='config_fw',target=config_fw)
-   	t1.start()
+	t1.start()
 	if (config_fw() == 'false'):
 		logger.info("[ERROR]: Config FW Failed")
 		return
