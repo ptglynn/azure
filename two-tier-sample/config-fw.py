@@ -501,7 +501,21 @@ def config_wp(nat_fqdn):
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: error changing permissions")
         return 'false'
-
+    
+    #Set the root password for mysql
+    logger.info("[INFO]: set root db passwd")
+    try:
+        subprocess.check_output(shlex.split("sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password panadmin'"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: error setting root password in mysql")
+        return 'false'
+        
+    logger.info("[INFO]: set db root passwd again")
+    try:
+        subprocess.check_output(shlex.split("sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password panadmin'"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: error confirmain root password in mysql")
+        return 'false'
 
     logger.info("[INFO]: ALL DONE!")
     #Create a marker file that shows WP is already configured so we don't run this script again.
