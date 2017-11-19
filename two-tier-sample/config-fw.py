@@ -341,14 +341,7 @@ def config_wp(nat_fqdn):
         logger.info("[ERROR]: link cgi mods enable error {}".format(e))
         return 'false'
 
-    #This means firewall already configured..so exit script.
-    if os.path.exists("./dvwa_configured") == True:
-        logger.info("[INFO]: WP already configured. Bon Appetit!")
-        return 'true'
-
-    logger.info("[INFO]: Install and Config wordpress server")
-
-	#configure the wordpress server
+    #configure the DVWA server
     try:
         subprocess.check_output(shlex.split("sudo apt-get install -y unzip"))
     except subprocess.CalledProcessError, e:
