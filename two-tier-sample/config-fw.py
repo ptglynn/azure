@@ -473,7 +473,36 @@ def config_wp(nat_fqdn):
         logger.info("[ERROR]: reconfigure allow_url_include error")
         return 'false'
     
-    logger.info("[INFO]: ALL DONE!")
+    logger.info("[INFO]: update config file")
+    try:
+        subprocess.check_output(shlex.split("sudo sed -i \"sed -i \"s/p@ssw0rd/panadmin/g\" /var/www/html/DVWA-master/config/config.inc.php"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: set admin password error")
+        return 'false'
+    
+    try:
+        subprocess.check_output(shlex.split("sudo sed -i \"s/avatar varchar(70)/avatar varchar(100)/g\" /var/www/html/DVWA-master/dvwa/includes/DBMS/MySQL.php"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: update DBMS error")
+        return 'false'
+
+	#Reconfigure PHP
+    logger.info("[INFO]: update directories")
+    try:
+        subprocess.check_output(shlex.split("sudo mv /var/www/html/DVWA-master /var/www/html/dvwa"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: error moving DVWA-master")
+        return 'false'
+    
+    #Reconfigure directory permissions
+    logger.info("[INFO]: update permissions")
+    try:
+        subprocess.check_output(shlex.split("sudo chmod 777 /var/www/html/dvwa /var/www/html/dvwa/hackable/uploads /var/www/html/dvwa/external/phpids/0.6/lib/IDS/tmp/phpids_log.txt"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: error changing permissions")
+        return 'false'
+
+logger.info("[INFO]: ALL DONE!")
     #Create a marker file that shows WP is already configured so we don't run this script again.
     open("./wp_configured", "w").close()
     return 'true'
