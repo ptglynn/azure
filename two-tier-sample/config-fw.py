@@ -349,21 +349,21 @@ def config_wp(nat_fqdn):
         logger.info("[ERROR]: apt-get install unzip error")
         return 'false'
     
-    logger.info("[INFO]: apt-get install php")
+	logger.info("[INFO]: apt-get install php")
 	try:
         subprocess.check_output(shlex.split("sudo apt-get install -y php"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: apt-get install php error")
         return 'false'
     
-    logger.info("[INFO]: apt-get install php-pear")
+	logger.info("[INFO]: apt-get install php-pear")
 	try:
         subprocess.check_output(shlex.split("sudo apt-get install -y php-pear"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: apt-get install php-pear error")
         return 'false'
     
-    logger.info("[INFO]: apt-get install debconf-utils")
+	logger.info("[INFO]: apt-get install debconf-utils")
 	try:
         subprocess.check_output(shlex.split("sudo apt-get install -y debconf-utils"))
     except subprocess.CalledProcessError, e:
@@ -371,21 +371,21 @@ def config_wp(nat_fqdn):
         return 'false'
 
     #Download DVWA
-    logger.info("[INFO]: download dvwa")
+	logger.info("[INFO]: download dvwa")
 	try:
         subprocess.check_output(shlex.split("sudo wget https://github.com/ethicalhack3r/DVWA/archive/master.zip -P /var/www/html/"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: wget DVWA error {}".format(e))
         return 'false'
 
-    logger.info("[INFO]: unzip dvwa")
+	logger.info("[INFO]: unzip dvwa")
 	try:
         subprocess.check_output(shlex.split("sudo unzip /var/www/html/master.zip -d /var/www/html/"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: ubzip DVWA error")
         return 'false'
     
-    logger.info("[INFO]: cp config file")
+	logger.info("[INFO]: cp config file")
 	try:
         subprocess.check_output(shlex.split("sudo cp /var/www/html/DVWA-master/config/config.inc.php.dist  /var/www/html/DVWA-master/config/config.inc.php"))
     except subprocess.CalledProcessError, e:
@@ -393,28 +393,28 @@ def config_wp(nat_fqdn):
         return 'false'
 
 	#Reconfigure PHP
-    logger.info("[INFO]: reconfigure dvwa")
+	logger.info("[INFO]: reconfigure dvwa")
 	try:
         subprocess.check_output(shlex.split("sudo sed -i \"s/allow_url_include = Off/allow_url_include = On/g\" /etc/php/7.0/apache2/php.ini"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: reconfigure allow_url_include error")
         return 'false'
     
-    logger.info("[INFO]: update config file")
+	logger.info("[INFO]: update config file")
 	try:
         subprocess.check_output(shlex.split("sudo sed -i \"sed -i \"s/p@ssw0rd/panadmin/g\" /var/www/html/DVWA-master/config/config.inc.php"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: set admin password error")
         return 'false'
     
-    try:
+	try:
         subprocess.check_output(shlex.split("sudo sed -i \"s/avatar varchar(70)/avatar varchar(100)/g\" /var/www/html/DVWA-master/dvwa/includes/DBMS/MySQL.php"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: update DBMS error")
         return 'false'
 
 	#Reconfigure PHP
-    logger.info("[INFO]: update directories")
+	logger.info("[INFO]: update directories")
 	try:
         subprocess.check_output(shlex.split("sudo mv /var/www/html/DVWA-master /var/www/html/dvwa"))
     except subprocess.CalledProcessError, e:
@@ -422,7 +422,7 @@ def config_wp(nat_fqdn):
         return 'false'
     
     #Reconfigure directory permissions
-    logger.info("[INFO]: update permissions")
+	logger.info("[INFO]: update permissions")
 	try:
         subprocess.check_output(shlex.split("sudo chmod 777 /var/www/html/dvwa /var/www/html/dvwa/hackable/uploads /var/www/html/dvwa/external/phpids/0.6/lib/IDS/tmp/phpids_log.txt"))
     except subprocess.CalledProcessError, e:
@@ -430,14 +430,14 @@ def config_wp(nat_fqdn):
         return 'false'
     
     #Set the root password for mysql
-    logger.info("[INFO]: set root db passwd")
+	logger.info("[INFO]: set root db passwd")
 	try:
         subprocess.check_output(shlex.split("sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password panadmin'"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: error setting root password in mysql")
         return 'false'
         
-    logger.info("[INFO]: set db root passwd again")
+	logger.info("[INFO]: set db root passwd again")
 	try:
         subprocess.check_output(shlex.split("sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password panadmin'"))
     except subprocess.CalledProcessError, e:
@@ -445,7 +445,7 @@ def config_wp(nat_fqdn):
         return 'false'
 
 	#Install mysql locally
-    logger.info("[INFO]: apt-get install mysql")
+	logger.info("[INFO]: apt-get install mysql")
 	try:
         subprocess.check_output(shlex.split("sudo apt-get install -y mysql-server"))
     except subprocess.CalledProcessError, e:
@@ -453,7 +453,7 @@ def config_wp(nat_fqdn):
         return 'false'
         
     #Create the DVWA database
-    logger.info("[INFO]: create db")
+	logger.info("[INFO]: create db")
 	try:
         subprocess.check_output(shlex.split("sudo mysql -uroot -ppanadmin -e \"CREATE DATABASE dvwa;\""))
     except subprocess.CalledProcessError, e:
@@ -461,14 +461,14 @@ def config_wp(nat_fqdn):
         return 'false'
 
 	#Restart apache2 to let this take effect
-    logger.info("[INFO]: restart apache")
+	logger.info("[INFO]: restart apache")
 	try:
         subprocess.check_output(shlex.split("systemctl restart apache2"))
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: Apache2 restart error {}".format(e))
         return 'false'
 
-    logger.info("[INFO]: ALL DONE!")
+	logger.info("[INFO]: ALL DONE!")
     #Create a marker file that shows WP is already configured so we don't run this script again.
     open("./wp_configured", "w").close()
     return 'true'
@@ -708,3 +708,4 @@ def check_job_status(job_id):
 
 if __name__ == "__main__":
     main()
+
