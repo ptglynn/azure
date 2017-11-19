@@ -342,7 +342,7 @@ def config_wp(nat_fqdn):
         return 'false'
 
     #configure the DVWA server
-    logger.info("[INFO]: apt-get install unzip")
+	logger.info("[INFO]: apt-get install unzip")
 	try:
         subprocess.check_output(shlex.split("sudo apt-get install -y unzip"))
     except subprocess.CalledProcessError, e:
@@ -708,4 +708,3 @@ def check_job_status(job_id):
 
 if __name__ == "__main__":
     main()
-
