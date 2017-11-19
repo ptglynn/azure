@@ -79,17 +79,10 @@ def main():
 	if(config_wp(sys.argv[1]) == 'false'):
 		logger.info("[ERROR]: Config WP failed")
 		return
-	logger.info("[INFO]: Configuring DVWA")
-	t3 = threading.Thread(name='config_dvwa', target=config_dvwa)
-	t3.start()
-	if(config_dvwa(sys.argv[1]) == 'false'):
-		logger.info("[ERROR]: Config DVWA failed")
-		return
 
 def config_fw():
     global api_key
     global MgmtIp
-
 
     #This means firewall already configured..so exit script.
     if os.path.exists("./firewall_configured") == True:
@@ -348,21 +341,6 @@ def config_wp(nat_fqdn):
         logger.info("[ERROR]: link cgi mods enable error {}".format(e))
         return 'false'
 
-    #Restart apache2 to let this take effect
-    try:
-        subprocess.check_output(shlex.split("systemctl restart apache2"))
-    except subprocess.CalledProcessError, e:
-        logger.info("[ERROR]: Apache2 restart error {}".format(e))
-        return 'false'
-
-    logger.info("[INFO]: ALL DONE!")
-    #Create a marker file that shows WP is already configured so we don't run this script again.
-    open("./wp_configured", "w").close()
-    return 'true'
-
-#Configure DVWA server
-def config_dvwa():
-
     #This means firewall already configured..so exit script.
     if os.path.exists("./dvwa_configured") == True:
         logger.info("[INFO]: WP already configured. Bon Appetit!")
@@ -473,8 +451,8 @@ def config_dvwa():
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: error setting root password in mysql")
         return 'false'
-    
-    #Restart apache2 to let this take effect
+
+	#Restart apache2 to let this take effect
     try:
         subprocess.check_output(shlex.split("systemctl restart apache2"))
     except subprocess.CalledProcessError, e:
@@ -483,7 +461,7 @@ def config_dvwa():
 
     logger.info("[INFO]: ALL DONE!")
     #Create a marker file that shows WP is already configured so we don't run this script again.
-    open("./dvwa_configured", "w").close()
+    open("./wp_configured", "w").close()
     return 'true'
                                             
 def send_command(cmd):
