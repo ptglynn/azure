@@ -72,22 +72,21 @@ def main():
 	logger.info("[INFO]: Configuring FW")
 	t1 = threading.Thread(name='config_fw',target=config_fw)
    	t1.start()
-    if (config_fw() == 'false'):
-        logger.info("[ERROR]: Config FW Failed")
-        return
+	if (config_fw() == 'false'):
+		logger.info("[ERROR]: Config FW Failed")
+		return
 	logger.info("[INFO]: Configuring WP")
-    t2 = threading.Thread(name='config_wp', target=config_wp, args=(sys.argv[1],))
-    t2.start()
-    if(config_wp(sys.argv[1]) == 'false'):
-         logger.info("[ERROR]: Config WP failed")
-         return
-
+	t2 = threading.Thread(name='config_wp', target=config_wp, args=(sys.argv[1],))
+	t2.start()
+	if(config_wp(sys.argv[1]) == 'false'):
+		logger.info("[ERROR]: Config WP failed")
+		return
 	logger.info("[INFO]: Configuring DVWA")
-    t3 = threading.Thread(name='config_dvwa', target=config_dvwa)
-    t3.start()
-    if(config_dvwa(sys.argv[1]) == 'false'):
-         logger.info("[ERROR]: Config DVWA failed")
-         return
+	t3 = threading.Thread(name='config_dvwa', target=config_dvwa)
+	t3.start()
+	if(config_dvwa(sys.argv[1]) == 'false'):
+		logger.info("[ERROR]: Config DVWA failed")
+		return
 
 def config_fw():
     global api_key
