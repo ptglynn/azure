@@ -414,6 +414,7 @@ def config_wp(nat_fqdn):
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: Apache2 restart error {}".format(e))
         return 'false'
+
     #configure the DVWA server
     logger.info("[INFO]: apt-get install unzip")
     try:
@@ -505,16 +506,16 @@ def config_wp(nat_fqdn):
     #Set the root password for mysql
     logger.info("[INFO]: set root db passwd")
     try:
-        subprocess.check_output(shlex.split("sudo debconf-set-selections" <<< \"mysql-server mysql-server/root_password password panadmin\""))
+        subprocess.check_output("sudo echo mysql-server mysql-server/root_password password panadmin | sudo debconf-set-selections", stderr=subprocess.STDOUT, shell=True)
     except subprocess.CalledProcessError, e:
         logger.info("[ERROR]: error setting root password in mysql")
         return 'false'
         
     logger.info("[INFO]: set db root passwd again")
     try:
-        subprocess.check_output(shlex.split("sudo debconf-set-selections" <<< \"mysql-server mysql-server/root_password_again password panadmin\""))
+        subprocess.check_output("sudo echo mysql-server mysql-server/root_password_again password panadmin | sudo debconf-set-selections", stderr=subprocess.STDOUT, shell=True)
     except subprocess.CalledProcessError, e:
-        logger.info("[ERROR]: error confirmain root password in mysql")
+        logger.info("[ERROR]: error confirming root password in mysql")
         return 'false'
 
     #Install mysql locally
