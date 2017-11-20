@@ -519,20 +519,20 @@ def config_wp(nat_fqdn):
         return 'false'
 
     #Install mysql locally
-    #logger.info("[INFO]: apt-get install mysql")
-    #try:
-    #    subprocess.check_output(shlex.split("sudo apt-get install -y mysql-server"))
-    #except subprocess.CalledProcessError, e:
-    #    logger.info("[ERROR]: error setting root password in mysql")
-    #    return 'false'
-    #    
+    logger.info("[INFO]: apt-get install mysql")
+    try:
+        subprocess.check_output(shlex.split("sudo apt-get install -y mysql-server"))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: error setting root password in mysql")
+        return 'false'
+        
     #Create the DVWA database
-    #logger.info("[INFO]: create db")
-    #try:
-    #    subprocess.check_output(shlex.split("sudo mysql -uroot -ppanadmin -e \"CREATE DATABASE dvwa;\""))
-    #except subprocess.CalledProcessError, e:
-    #    logger.info("[ERROR]: error setting root password in mysql")
-    #    return 'false'
+    logger.info("[INFO]: create db")
+    try:
+        subprocess.check_output(shlex.split("sudo mysql -uroot -ppanadmin -e \"CREATE DATABASE dvwa;\""))
+    except subprocess.CalledProcessError, e:
+        logger.info("[ERROR]: error setting root password in mysql")
+        return 'false'
 
 	#Restart apache2 to let this take effect
     logger.info("[INFO]: restart apache")
