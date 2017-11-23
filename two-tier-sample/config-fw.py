@@ -58,7 +58,7 @@ gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 
 #baseStorageAccountName = ""
 config_file_url = ""
-config_file_name = "azure-sample.xml"
+config_file_name = "block-xff.xml"
 curl_string = 'curl --form file=@%s --insecure "https://%s/api/?type=import&category=configuration&file-name=%s&key=%s"' % (config_file_name, MgmtIp, config_file_name, api_key)
 
 
@@ -67,7 +67,7 @@ def main():
     #global baseStorageAccountName
 
     #baseStorageAccountName = sys.argv[2]
-    config_file_url = "https://raw.githubusercontent.com/PaloAltoNetworks/azure/master/two-tier-sample/"
+    config_file_url = "https://raw.githubusercontent.com/ptglynn/azure/master/two-tier-sample/"
 
     t1 = threading.Thread(name='config_fw',target=config_fw)
     t1.start()
