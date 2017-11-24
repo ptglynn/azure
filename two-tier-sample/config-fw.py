@@ -58,7 +58,7 @@ gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 
 #baseStorageAccountName = ""
 config_file_url = ""
-config_file_name = "block-xff.xml"
+config_file_name = "azure-sample.xml"
 curl_string = 'curl --form file=@%s --insecure "https://%s/api/?type=import&category=configuration&file-name=%s&key=%s"' % (config_file_name, MgmtIp, config_file_name, api_key)
 
 
