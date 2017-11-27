@@ -153,12 +153,43 @@ def config_fw():
         local_file.close()
     #handle errors
     except urllib2.HTTPError, e:
-        logger.info("[ERROR]HTTP Error: {}".format(e.code))
+        logger.info("[ERROR]config_file_name1 HTTP Error: {}".format(e.code))
         return 'false'
     except urllib2.URLError, e:
-        logger.info("[ERROR]HTTP Error: {}".format(e.reason))
+        logger.info("[ERROR]config_file_name1 HTTP Error: {}".format(e.reason))
         return 'false'
+    
+    try:
+        err = urllib2.urlopen(config_file_url+config_file_name2,context=gcontext, timeout=10)
+        #err = urllib2.urlopen(config_file_url+config_file_name1, timeout=10)
+        logger.info("DOWNLOADING CONFIG FILE" + config_file_url+config_file_name2)
 
+        with open(config_file_name2, "w") as local_file:
+            local_file.write(err.read())
+        local_file.close()
+    #handle errors
+    except urllib2.HTTPError, e:
+        logger.info("[ERROR]config_file_name2 HTTP Error: {}".format(e.code))
+        return 'false'
+    except urllib2.URLError, e:
+        logger.info("[ERROR]config_file_name2 HTTP Error: {}".format(e.reason))
+        return 'false'
+    
+    try:
+        err = urllib2.urlopen(config_file_url+config_file_name3,context=gcontext, timeout=10)
+        #err = urllib2.urlopen(config_file_url+config_file_name1, timeout=10)
+        logger.info("DOWNLOADING CONFIG FILE" + config_file_url+config_file_name3)
+
+        with open(config_file_name3, "w") as local_file:
+            local_file.write(err.read())
+        local_file.close()
+    #handle errors
+    except urllib2.HTTPError, e:
+        logger.info("[ERROR]config_file_name3 HTTP Error: {}".format(e.code))
+        return 'false'
+    except urllib2.URLError, e:
+        logger.info("[ERROR]config_file_name3 HTTP Error: {}".format(e.reason))
+        return 'false'
 
     if (send_command('import_config') == 'false'):
         logger.info("[ERROR]: Import config error")
