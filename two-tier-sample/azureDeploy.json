@@ -872,6 +872,7 @@
                 }
             },
             {
+                "condition": "[equals(parameters('DeploymentType'), 'Advanced')]",
                 "name": "MSDeploy",
                 "type": "extensions",
                 "location": "[resourceGroup().location]",
