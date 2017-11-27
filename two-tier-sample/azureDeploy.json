@@ -62,28 +62,28 @@
             "metadata": {
                 "description": "The name of the Azure Function being Deployed (Advanced Only)"
             },
-            "defaultValue": "None"
+            "defaultValue": "Only required for Advanced deployments"
         },
     "codeStorageAccount": {
             "type": "string",
             "metadata": {
                 "description": "Storage Account Name housing the Azure Function code (Advanced Only)"
             },
-            "defaultValue": "None"
+            "defaultValue": "Only required for Advanced deployments"
         },
         "codeStorageContainer": {
             "type": "string",
             "metadata": {
                 "description": "Container where the zip file containing the Azure Function code resides (Advanced Only)"
             },
-            "defaultValue": "None"
+            "defaultValue": "Only required for Advanced deployments"
         },
         "codeZipFile": {
             "type": "string",
             "metadata": {
                 "description": "Name of Zip file containing the Azure Function code (Advanced Only)"
             },
-            "defaultValue": "None"
+            "defaultValue": "Only required for Advanced deployments"
         }
     },
     "variables": {
