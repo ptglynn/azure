@@ -2,6 +2,16 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "DeploymentType": {
+      "type": "string",
+      "allowedValues": [
+        "Basic",
+        "Advanced"
+      ],
+      "metadata": {
+        "description": "Advanced = Create Azure Functions, Basic = Standard two-tier-sample"
+      }
+    },
     "StorageAccountName": {
       "type": "string",
       "metadata": {
@@ -790,10 +800,10 @@
             {
                 "mode": "Incremental",
                 "template":
-            {
-                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-                "contentVersion": "1.0.0.0",
-                "resources": [
+              {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": [
                     {
                         "apiVersion": "[variables('apiVersion')]",
                         "type": "Microsoft.Network/virtualNetworks/subnets",
@@ -810,70 +820,71 @@
                         }
                     }
                 }]
-
             }
+          }
+    },
+    {
+        "condition": "[equals(parameters('DeploymentType'), 'Advanced')]",
+        "type": "Microsoft.Web/serverfarms",
+        "apiVersion": "2015-04-01",
+        "name": "[variables('hostingPlanName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+            "name": "[variables('hostingPlanName')]",
+            "computeMode": "Dynamic",
+            "sku": "Dynamic"
         }
     },
     {
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2015-04-01",
-            "name": "[variables('hostingPlanName')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "name": "[variables('hostingPlanName')]",
-                "computeMode": "Dynamic",
-                "sku": "Dynamic"
-            }
-        },
-        {
-            "apiVersion": "2015-08-01",
-            "type": "Microsoft.Web/sites",
+        "condition": "[equals(parameters('DeploymentType'), 'Advanced')]",
+        "apiVersion": "2015-08-01",
+        "type": "Microsoft.Web/sites",
+        "name": "[variables('functionAppName')]",
+        "location": "[resourceGroup().location]",
+        "kind": "functionapp",
+        "properties": {
             "name": "[variables('functionAppName')]",
-            "location": "[resourceGroup().location]",
-            "kind": "functionapp",
-            "properties": {
-                "name": "[variables('functionAppName')]",
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('strAccountName'))]"
-            ],
-            "resources": [
-                {
-                    "apiVersion": "2016-03-01",
-                    "name": "appsettings",
-                    "type": "config",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]",
-                        "[resourceId('Microsoft.Storage/storageAccounts', variables('strAccountName'))]",
-                        "[concat('Microsoft.Web/sites/', variables('functionAppName'), '/Extensions/MSDeploy')]"
-                    ],
-                    "properties": {
-                        "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('strAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('strAccountName')), '2015-05-01-preview').key1,';')]", 
-                        "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('strAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('strAccountName')), '2015-05-01-preview').key1,';')]", 
-                        "FUNCTIONS_EXTENSION_VERSION": "~1"
-                    }
-                },
-                {
-                    "name": "MSDeploy",
-                    "type": "extensions",
-                    "location": "[resourceGroup().location]",
-                    "apiVersion": "2015-08-01",
-                    "dependsOn": [
-                        "[concat('Microsoft.Web/sites/', variables('functionAppName'))]"
-                    ],
-                    "tags": {
-                        "displayName": "webdeploy"
-                    },
-                    "properties": {
-                        "packageUri": "[concat('https://',parameters('codeStorageAccount'), '.blob.core.windows.net/', parameters('codeStorageContainer'), '/', parameters('codeZipFile'))]",
-                        "dbType": "None",
-                        "connectionString": ""
-                    }
+            "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+        },
+        "dependsOn": [
+            "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('strAccountName'))]"
+        ],
+        "resources": [
+            {
+                "apiVersion": "2016-03-01",
+                "name": "appsettings",
+                "type": "config",
+                "dependsOn": [
+                    "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]",
+                    "[resourceId('Microsoft.Storage/storageAccounts', variables('strAccountName'))]",
+                    "[concat('Microsoft.Web/sites/', variables('functionAppName'), '/Extensions/MSDeploy')]"
+                ],
+                "properties": {
+                    "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('strAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('strAccountName')), '2015-05-01-preview').key1,';')]", 
+                    "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('strAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('strAccountName')), '2015-05-01-preview').key1,';')]", 
+                    "FUNCTIONS_EXTENSION_VERSION": "~1"
                 }
-			]
-        }
+            },
+            {
+                "name": "MSDeploy",
+                "type": "extensions",
+                "location": "[resourceGroup().location]",
+                "apiVersion": "2015-08-01",
+                "dependsOn": [
+                    "[concat('Microsoft.Web/sites/', variables('functionAppName'))]"
+                ],
+                "tags": {
+                    "displayName": "webdeploy"
+                },
+                "properties": {
+                    "packageUri": "[concat('https://',parameters('codeStorageAccount'), '.blob.core.windows.net/', parameters('codeStorageContainer'), '/', parameters('codeZipFile'))]",
+                    "dbType": "None",
+                    "connectionString": ""
+                }
+            }
+        ]
+    }
   ],
   "outputs":
   {
