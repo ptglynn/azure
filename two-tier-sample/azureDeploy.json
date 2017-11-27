@@ -9,7 +9,7 @@
         "Advanced"
       ],
       "metadata": {
-        "description": "Advanced = Create Azure Functions, Basic = Standard two-tier-sample"
+        "description": "Basic = Standard two-tier-sample, Advanced = Create Azure Functions"
       }
     },
     "StorageAccountName": {
