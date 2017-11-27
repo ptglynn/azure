@@ -856,6 +856,7 @@
         ],
         "resources": [
             {
+                "condition": "[equals(parameters('DeploymentType'), 'Advanced')]",
                 "apiVersion": "2016-03-01",
                 "name": "appsettings",
                 "type": "config",
