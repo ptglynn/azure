@@ -58,8 +58,12 @@ gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 
 #baseStorageAccountName = ""
 config_file_url = ""
-config_file_name = "azure-sample.xml"
-curl_string = 'curl --form file=@%s --insecure "https://%s/api/?type=import&category=configuration&file-name=%s&key=%s"' % (config_file_name, MgmtIp, config_file_name, api_key)
+config_file_name1 = "azure-sample.xml"
+curl_string1 = 'curl --form file=@%s --insecure "https://%s/api/?type=import&category=configuration&file-name=%s&key=%s"' % (config_file_name1, MgmtIp, config_file_name1, api_key)
+config_file_name2 = "azure-nsg.xml"
+curl_string2 = 'curl --form file=@%s --insecure "https://%s/api/?type=import&category=configuration&file-name=%s&key=%s"' % (config_file_name2, MgmtIp, config_file_name2, api_key)
+config_file_name3 = "block-xff.xml"
+curl_string3 = 'curl --form file=@%s --insecure "https://%s/api/?type=import&category=configuration&file-name=%s&key=%s"' % (config_file_name3, MgmtIp, config_file_name3, api_key)
 
 
 def main():
@@ -140,11 +144,11 @@ def config_fw():
     #Config gw
     #Download the config file from Azure storage account to local disk
     try:
-        err = urllib2.urlopen(config_file_url+config_file_name,context=gcontext, timeout=10)
-        #err = urllib2.urlopen(config_file_url+config_file_name, timeout=10)
-        logger.info("DOWNLOADING CONFIG FILE" + config_file_url+config_file_name)
+        err = urllib2.urlopen(config_file_url+config_file_name1,context=gcontext, timeout=10)
+        #err = urllib2.urlopen(config_file_url+config_file_name1, timeout=10)
+        logger.info("DOWNLOADING CONFIG FILE" + config_file_url+config_file_name1)
 
-        with open(config_file_name, "w") as local_file:
+        with open(config_file_name1, "w") as local_file:
             local_file.write(err.read())
         local_file.close()
     #handle errors
@@ -241,7 +245,7 @@ def config_wp(nat_fqdn):
     #Download the wp config file from Azure storage account to local disk
     #try:
     #    err = urllib2.urlopen(config_file_url+wp_script_file, context=gcontext, timeout=10)
-        #err = urllib2.urlopen(config_file_url+config_file_name, timeout=10)
+        #err = urllib2.urlopen(config_file_url+config_file_name1, timeout=10)
     #    logger.info("DOWNLOADING CONFIG FILE" + config_file_url+wp_script_file)
 
     #    with open(wp_script_file, "w") as local_file:
@@ -550,28 +554,60 @@ def config_wp(nat_fqdn):
 def send_command(cmd):
     global MgmtIp
     global api_key
-    global curl_string
+    global curl_string1
+    global curl_string2
+    global curl_string3
 
     job_id = ""
     if (cmd == 'commit'):
         cmd_string = "https://"+MgmtIp+"/api/?type=commit&cmd=<commit></commit>&key="+api_key
     elif (cmd == 'import_config'):
-        p = subprocess.Popen(shlex.split(curl_string), stdout=subprocess.PIPE)
+        p = subprocess.Popen(shlex.split(curl_string1), stdout=subprocess.PIPE)
         resp_header = et.fromstring(p.communicate()[0])
         if resp_header.tag != 'response':
-            logger.info("[ERROR]: didn't get a valid response from firewall")
+            logger.info("[ERROR]: curl_string1 - didn't get a valid response from firewall")
             return 'false'
 
         if resp_header.attrib['status'] == 'error':
-            logger.info("[ERROR]: Got an error for the command")
+            logger.info("[ERROR]: curl_string1 - Got an error for the command")
             return 'false'
 
         if resp_header.attrib['status'] == 'success':
             #The fw responded with a successful command execution. No need to check what the actual response is
-            logger.info("[INFO]: Successfully executed command")
+            logger.info("[INFO]: curl_string1 - Successfully executed command")
+            return 'true'
+    elif (cmd == 'import_config'):
+        p = subprocess.Popen(shlex.split(curl_string2), stdout=subprocess.PIPE)
+        resp_header = et.fromstring(p.communicate()[0])
+        if resp_header.tag != 'response':
+            logger.info("[ERROR]: curl_string2 - didn't get a valid response from firewall")
+            return 'false'
+
+        if resp_header.attrib['status'] == 'error':
+            logger.info("[ERROR]: curl_string2 - Got an error for the command")
+            return 'false'
+
+        if resp_header.attrib['status'] == 'success':
+            #The fw responded with a successful command execution. No need to check what the actual response is
+            logger.info("[INFO]: curl_string2 - Successfully executed command")
+            return 'true'
+    elif (cmd == 'import_config'):
+        p = subprocess.Popen(shlex.split(curl_string3), stdout=subprocess.PIPE)
+        resp_header = et.fromstring(p.communicate()[0])
+        if resp_header.tag != 'response':
+            logger.info("[ERROR]: curl_string3 - didn't get a valid response from firewall")
+            return 'false'
+
+        if resp_header.attrib['status'] == 'error':
+            logger.info("[ERROR]: curl_string3 - Got an error for the command")
+            return 'false'
+
+        if resp_header.attrib['status'] == 'success':
+            #The fw responded with a successful command execution. No need to check what the actual response is
+            logger.info("[INFO]: curl_string3 - Successfully executed command")
             return 'true'
     elif (cmd == 'load_config'):
-        cmd_string = "https://"+MgmtIp+"/api/?type=op&cmd=<load><config><from>"+config_file_name+"</from></config></load>&key="+api_key
+        cmd_string = "https://"+MgmtIp+"/api/?type=op&cmd=<load><config><from>"+config_file_name1+"</from></config></load>&key="+api_key
     elif (cmd == 'download'):
         cmd_string =  "https://"+MgmtIp+"/api/?type=op&cmd=<request><content><upgrade><download><latest></latest></download></upgrade></content></request>&key="+api_key
     elif (cmd == 'install'):
