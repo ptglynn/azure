@@ -606,7 +606,7 @@ def send_command(cmd):
         if resp_header.attrib['status'] == 'success':
             #The fw responded with a successful command execution. No need to check what the actual response is
             logger.info("[INFO]: curl_string1 - Successfully executed command")
-            return 'true'
+            # return 'true'
         p = subprocess.Popen(shlex.split(curl_string2), stdout=subprocess.PIPE)
         resp_header = et.fromstring(p.communicate()[0])
         if resp_header.tag != 'response':
@@ -620,7 +620,7 @@ def send_command(cmd):
         if resp_header.attrib['status'] == 'success':
             #The fw responded with a successful command execution. No need to check what the actual response is
             logger.info("[INFO]: curl_string2 - Successfully executed command")
-            return 'true'
+            # return 'true'
         p = subprocess.Popen(shlex.split(curl_string3), stdout=subprocess.PIPE)
         resp_header = et.fromstring(p.communicate()[0])
         if resp_header.tag != 'response':
@@ -633,7 +633,7 @@ def send_command(cmd):
 
         if resp_header.attrib['status'] == 'success':
             #The fw responded with a successful command execution. No need to check what the actual response is
-            logger.info("[INFO]: curl_string3 - Successfully executed command")
+            logger.info("[INFO]: Successfully uploaded all config files")
             return 'true'
     elif (cmd == 'load_config'):
         cmd_string = "https://"+MgmtIp+"/api/?type=op&cmd=<load><config><from>"+config_file_name1+"</from></config></load>&key="+api_key
